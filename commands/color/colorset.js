@@ -20,7 +20,10 @@ async function execute(interaction) {
         await newGuild.save();
         thisGuild = newGuild;
     }
-    if (thisGuild.banList.includes(member.id)) { return; }
+    if (thisGuild.banList.includes(member.id)
+        || !member.roles.cache.some(role => thisGuild.allowedRoles.includes(role.id))) {
+        return;
+    }
 
     const clrIDlist = thisGuild.colorRoles;
     if (!roleChoice || !clrIDlist.find(ele => ele === roleChoice.id)) {
@@ -30,7 +33,7 @@ async function execute(interaction) {
         const memberRoles = member.roles.cache.reduce((acc, cur) => {
             acc.push(cur);
             return acc;
-        }, []);        
+        }, []);
 
         // if for some reason member already has the role
         if (memberRoles.includes(roleChoice)) {
@@ -55,7 +58,7 @@ async function execute(interaction) {
         // add new color
         memberRoles.push(roleChoice);
 
-        member.roles.set(memberRoles).catch(err => {console.log(err)});
+        member.roles.set(memberRoles).catch(err => { console.log(err); });
         thisGuild.numUses += 1;
         await thisGuild.save();
         await interaction.reply(`Success! Changed your color to ${roleChoice.name}.`);

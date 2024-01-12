@@ -13,14 +13,19 @@ async function execute(interaction) {
         await newGuild.save();
         thisGuild = newGuild;
     }
-    if (thisGuild.banList.includes(interaction.member.id)) { return; }
+    if (thisGuild.banList.includes(interaction.member.id)
+        || !interaction.member.roles.cache.some(role => thisGuild.allowedRoles.includes(role.id))) {
+        return;
+    }
 
     const clrIDlist = thisGuild.colorRoles;
     if (!clrIDlist.length) {
         await interaction.reply('There are currently no color roles registered.');
     } else {
         const colorRoleNames = [];
-        clrIDlist.forEach(item => { colorRoleNames.push(interaction.guild.roles.cache.get(item).name); });
+        clrIDlist.forEach(item => {
+            colorRoleNames.push(interaction.guild.roles.cache.get(item).name);
+        });
         await interaction.reply(`Colors:\n${colorRoleNames.join(', ')}`);
     }
 }

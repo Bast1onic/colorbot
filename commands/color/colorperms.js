@@ -2,37 +2,28 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const GuildModel = require('../../models/GuildModel.js');
 
 const data = new SlashCommandBuilder()
-    .setName('colorrole')
-    .setDescription('Manage colors')
+    .setName('colorperms')
+    .setDescription('Manage roles needed for bot use')
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
     .setDMPermission(false);
 
 data.addSubcommand(subcommand => subcommand
     .setName('add')
-    .setDescription('Add color to color list')
+    .setDescription('Add role to perms list')
     .addRoleOption(option => option
-        .setName('color')
-        .setDescription('The color to add')));
+        .setName('role')
+        .setDescription('The role to add')));
 data.addSubcommand(subcommand => subcommand
     .setName('remove')
-    .setDescription('Remove color from color list')
+    .setDescription('Remove role from perms list')
     .addRoleOption(option => option
-        .setName('color')
+        .setName('role')
         .setDescription('The color to remove')));
 
 async function execute(interaction) {
-    const role = interaction.options.getRole('color');
+    const role = interaction.options.getRole('role');
     if (!role) {
         await interaction.reply('Please select a role.');
-        return;
-    } if (role.permissions.bitfield !== 0n) {
-        await interaction.reply('That role has permissions associated with it. It can\'t be used as a color role.');
-        return;
-    } if (role.color === 0) {
-        await interaction.reply('That role doesn\'t have a color.');
-        return;
-    } if (interaction.guild.roles.cache.find(r => r.name === role.name)) {
-        await interaction.reply('You already have a role with that name in the color list. Color names must be unique.');
         return;
     }
 
@@ -42,26 +33,27 @@ async function execute(interaction) {
         await newGuild.save();
         thisGuild = newGuild;
     }
-    const clrIDlist = thisGuild.colorRoles;
-    const listInd = clrIDlist.findIndex(ele => ele === role.id);
+    const listInd = thisGuild.allowedRoles.findIndex(ele => ele === role.id);
 
     if (interaction.options.getSubcommand() === 'add') {
         if (listInd !== -1) {
             await interaction.reply('That role is already in the list');
             return;
         }
-        clrIDlist.push(role.id);
+        thisGuild.allowedRoles.push(role.id);
         await thisGuild.save();
-        await interaction.reply(`Added ${role.name} to list`);
+        await interaction.reply(`Added ${role.name} to perms list`);
     } else if (interaction.options.getSubcommand() === 'remove') {
         if (listInd === -1) {
             await interaction.reply('That role isn\'t in the list');
             return;
         }
-        clrIDlist.splice(listInd, 1);
+        thisGuild.allowedRoles.splice(listInd, 1);
         await thisGuild.save();
-        await interaction.reply(`Removed ${role.name} from list`);
+        await interaction.reply(`Removed ${role.name} from perms list`);
     }
+    const rolesString = thisGuild.allowedRoles.map(ele => interaction.guild.roles.cache.find(r => r.id === ele).name).join(',');
+    await interaction.reply(`Current allowed roles: ${rolesString}`);
 }
 
 module.exports = {
