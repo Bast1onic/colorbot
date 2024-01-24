@@ -1,6 +1,6 @@
-const { SlashCommandBuilder } = require('discord.js');
-const GuildModel = require('../../models/GuildModel.js');
-const MemberModel = require('../../models/MemberModel.js');
+import { SlashCommandBuilder } from 'discord.js';
+import GuildModel from '../../models/GuildModel.js';
+import MemberModel from '../../models/MemberModel.js';
 
 const data = new SlashCommandBuilder()
     .setName('colorset')
@@ -65,7 +65,5 @@ async function execute(interaction) {
     }
 }
 
-module.exports = {
-    data,
-    execute
-};
+const command  = {data, execute};
+export default command;

@@ -1,5 +1,5 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
-const GuildModel = require('../../models/GuildModel.js');
+import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
+import GuildModel from '../../models/GuildModel.js';
 
 const data = new SlashCommandBuilder()
     .setName('colorban')
@@ -35,7 +35,5 @@ async function execute(interaction) {
     await interaction.reply(`Unbanning ${target.username} for reason: ${reason}`);
 }
 
-module.exports = {
-    data,
-    execute
-};
+const command  = {data, execute};
+export default command;

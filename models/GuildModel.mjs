@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const MemberModel = require('./MemberModel.js');
+import mongoose from 'mongoose';
+import MemberModel from './MemberModel.js';
 
 const guildSchema = new mongoose.Schema({
     guildID: {
@@ -32,4 +32,4 @@ const guildSchema = new mongoose.Schema({
 
 const GuildModel = mongoose.model('Guild', guildSchema);
 
-module.exports = GuildModel;
+export default GuildModel;
